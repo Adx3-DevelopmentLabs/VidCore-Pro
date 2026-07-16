@@ -30,6 +30,38 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>VidCore-Pro | منصة بث الوسائط العالمية</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+            .container { background: #1e293b; padding: 3rem; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); border: 1px solid #334155; }
+            h1 { color: #38bdf8; font-size: 2.5rem; margin-bottom: 1rem; }
+            p { font-size: 1.2rem; color: #94a3b8; margin-bottom: 2rem; }
+            .status { display: inline-block; padding: 0.5rem 1rem; background: #065f46; color: #34d399; border-radius: 2rem; font-weight: bold; margin-bottom: 2rem; }
+            .api-link { color: #38bdf8; text-decoration: none; font-weight: bold; border: 1px solid #38bdf8; padding: 0.75rem 1.5rem; border-radius: 0.5rem; transition: all 0.3s; }
+            .api-link:hover { background: #38bdf8; color: #0f172a; }
+            .footer { margin-top: 3rem; font-size: 0.9rem; color: #64748b; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🚀 VidCore-Pro</h1>
+            <div class="status">● السيرفر يعمل بنجاح (World-Class Version)</div>
+            <p>مرحباً بك في أقوى منصة عالمية لتجميع وبث الوسائط. المحرك جاهز لخدمة تطبيقاتك بأعلى كفاءة.</p>
+            <a href="/api/health" class="api-link">فحص حالة الـ API</a>
+            <div class="footer">بنيت بواسطة Manus AI نحو القمة 🔝</div>
+        </div>
+    </body>
+    </html>
+  `);
+});
+
 app.use('/api', router);
 
 // Global Error Handler
