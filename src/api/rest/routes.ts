@@ -8,6 +8,7 @@ import { SmartResolver } from '../../core/resolver/smart-resolver.js';
 import { ValidationEngine } from '../../core/validation-engine/validation.engine.js';
 import { SubtitleService } from '../../services/subtitles/subtitle.service.js';
 import { QualityOrchestrator } from '../../core/orchestrator/quality.orchestrator.js';
+import { ProviderEngine } from '../../core/providers/provider.engine.js';
 
 const router: Router = Router();
 const tmdb = new TmdbService(process.env.TMDB_API_KEY || '');
@@ -49,6 +50,28 @@ router.get('/resolve', async (req, res) => {
     res.json(result);
   } catch (error: any) {
     res.status(500).json({ error: 'Resolution failed', details: error.message });
+  }
+});
+
+router.get('/watch', async (req, res) => {
+  try {
+    const { type, id, s, e } = req.query;
+    if (!id) return res.status(400).json({ error: 'TMDB ID is required' });
+    
+    const cached = cacheService.get(`watch:${type}:${id}:${s}:${e}`);
+    if (cached) return res.json(cached);
+
+    const results = await ProviderEngine.resolveFromTmdb(
+      (type as 'movie' | 'tv') || 'movie',
+      id as string,
+      parseInt(s as string) || 1,
+      parseInt(e as string) || 1
+    );
+
+    cacheService.set(`watch:${type}:${id}:${s}:${e}`, results);
+    res.json(results);
+  } catch (error: any) {
+    res.status(500).json({ error: 'Watch resolution failed', details: error.message });
   }
 });
 

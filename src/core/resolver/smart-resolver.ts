@@ -63,6 +63,19 @@ export class SmartResolver {
         }
       });
 
+      // Strategy 5: Aggressive iframe recursion
+      const iframes: string[] = [];
+      $('iframe').each((_, el) => {
+        const src = $(el).attr('src');
+        if (src) iframes.push(src.startsWith('//') ? `https:${src}` : src);
+      });
+
+      for (const iframeUrl of iframes) {
+        if (iframeUrl.includes('ads') || iframeUrl.includes('pop')) continue;
+        const subLinks = await this.resolve(iframeUrl);
+        subLinks.forEach(link => m3u8Links.add(link));
+      }
+
       return Array.from(m3u8Links);
     } catch (error: any) {
       logger.error(`SmartResolver failed for ${url}: ${error.message}`);
