@@ -4,14 +4,38 @@ import { sourceAggregator } from '../../core/source-discovery/aggregator.js';
 import { cacheService } from '../../core/cache-layer/cache.service.js';
 import { IptvManager } from '../../core/iptv/iptv.manager.js';
 import { TmdbService } from '../../services/tmdb/tmdb.service.js';
+import { SmartResolver } from '../../core/resolver/smart-resolver.js';
+import { ValidationEngine } from '../../core/validation-engine/validation.engine.js';
 
 const router: Router = Router();
 const tmdb = new TmdbService(process.env.TMDB_API_KEY || '');
 
 router.get('/proxy', async (req, res) => {
-  const { url } = req.query;
-  if (!url) return res.status(400).send('URL is required');
-  await ProxyEngine.proxyStream(req, res, url as string);
+  try {
+    const { url } = req.query;
+    if (!url) return res.status(400).json({ error: 'URL is required' });
+    await ProxyEngine.proxyStream(req, res, url as string);
+  } catch (error: any) {
+    res.status(500).json({ error: 'Proxy failed', details: error.message });
+  }
+});
+
+router.get('/resolve', async (req, res) => {
+  try {
+    const { url } = req.query;
+    if (!url) return res.status(400).json({ error: 'URL is required' });
+    
+    const cached = cacheService.get(`resolve:${url}`);
+    if (cached) return res.json({ links: cached });
+
+    const links = await SmartResolver.resolve(url as string);
+    const validLinks = await ValidationEngine.validateBatch(links);
+    
+    cacheService.set(`resolve:${url}`, validLinks);
+    res.json({ links: validLinks });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Resolution failed', details: error.message });
+  }
 });
 
 router.get('/search', async (req, res) => {

@@ -32,6 +32,15 @@ app.use((req, res, next) => {
 
 app.use('/api', router);
 
+// Global Error Handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  logger.error(`Unhandled error: ${err.message}`);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message
+  });
+});
+
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
