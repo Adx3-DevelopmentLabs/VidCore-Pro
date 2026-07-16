@@ -2,8 +2,11 @@ import { Router } from 'express';
 import { ProxyEngine } from '../../core/proxy-engine/proxy.engine.js';
 import { sourceAggregator } from '../../core/source-discovery/aggregator.js';
 import { cacheService } from '../../core/cache-layer/cache.service.js';
+import { IptvManager } from '../../core/iptv/iptv.manager.js';
+import { TmdbService } from '../../services/tmdb/tmdb.service.js';
 
 const router: Router = Router();
+const tmdb = new TmdbService(process.env.TMDB_API_KEY || '');
 
 router.get('/proxy', async (req, res) => {
   const { url } = req.query;
@@ -18,9 +21,21 @@ router.get('/search', async (req, res) => {
   const cached = cacheService.get(`search:${q}`);
   if (cached) return res.json(cached);
 
-  const results = await sourceAggregator.searchAll(q as string);
+  const [sources, metadata] = await Promise.all([
+    sourceAggregator.searchAll(q as string),
+    tmdb.searchMovie(q as string)
+  ]);
+
+  const results = { sources, metadata };
   cacheService.set(`search:${q}`, results);
   res.json(results);
+});
+
+router.get('/iptv/parse', async (req, res) => {
+  const { url } = req.query;
+  if (!url) return res.status(400).send('M3U URL is required');
+  const channels = await IptvManager.parseM3u(url as string);
+  res.json(channels);
 });
 
 router.get('/health', (req, res) => {

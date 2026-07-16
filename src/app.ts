@@ -20,8 +20,10 @@ app.use(express.json());
 
 import { sourceAggregator } from './core/source-discovery/aggregator.js';
 import { SampleMovieAggregator } from './plugins/movie-sources/sample-movie.js';
+import { GlobalAggregator } from './plugins/global-sources/global-aggregator.js';
 
 sourceAggregator.register(new SampleMovieAggregator());
+sourceAggregator.register(new GlobalAggregator());
 
 app.use((req, res, next) => {
   logger.info(`${req.method} ${req.url}`);
