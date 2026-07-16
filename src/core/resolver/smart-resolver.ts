@@ -72,8 +72,25 @@ export class SmartResolver {
 
       for (const iframeUrl of iframes) {
         if (iframeUrl.includes('ads') || iframeUrl.includes('pop')) continue;
-        const subLinks = await this.resolve(iframeUrl);
-        subLinks.forEach(link => m3u8Links.add(link));
+        // Deep recursive resolving for protected providers
+        try {
+          const subLinks = await this.resolve(iframeUrl);
+          subLinks.forEach(link => m3u8Links.add(link));
+        } catch (err) {
+          logger.warn(`Failed recursive resolve for ${iframeUrl}`);
+        }
+      }
+
+      // Strategy 6: Search for hidden JSON objects containing M3U8
+      const jsonRegex = /\{.*"file".*".*\.m3u8".*\}/g;
+      const jsonMatches = response.data.match(jsonRegex);
+      if (jsonMatches) {
+        jsonMatches.forEach((match: string) => {
+          try {
+            const parsed = JSON.parse(match);
+            if (parsed.file && parsed.file.includes('.m3u8')) m3u8Links.add(this.cleanLink(parsed.file));
+          } catch {}
+        });
       }
 
       return Array.from(m3u8Links);

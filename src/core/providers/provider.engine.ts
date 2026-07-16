@@ -10,36 +10,30 @@ export interface Provider {
 
 export class ProviderEngine {
   private static providers: Provider[] = [
-    {
-      name: 'VidSrc',
-      baseUrl: 'https://vidsrc.me/embed',
-      getMovieUrl: (id) => `https://vidsrc.me/embed/movie?tmdb=${id}`,
-      getTvUrl: (id, s, e) => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}`
-    },
-    {
-      name: 'VidSrc.to',
-      baseUrl: 'https://vidsrc.to/embed',
-      getMovieUrl: (id) => `https://vidsrc.to/embed/movie/${id}`,
-      getTvUrl: (id, s, e) => `https://vidsrc.to/embed/tv/${id}/${s}/${e}`
-    },
-    {
-      name: 'SuperEmbed',
-      baseUrl: 'https://multiembed.mov',
-      getMovieUrl: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=1`,
-      getTvUrl: (id, s, e) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`
-    },
-    {
-      name: 'AkasMovie (Arabic)',
-      baseUrl: 'https://akwam.to',
-      getMovieUrl: (id) => `https://akwam.to/search?q=${id}`, // Simplified for logic
-      getTvUrl: (id, s, e) => `https://akwam.to/search?q=${id}`
-    },
-    {
-      name: 'Anilist (Anime)',
-      baseUrl: 'https://anilist.co',
-      getMovieUrl: (id) => `https://anilist.co/search/anime?search=${id}`,
-      getTvUrl: (id, s, e) => `https://anilist.co/search/anime?search=${id}`
-    }
+    // --- 🇸🇦 Arabic Providers ---
+    { name: 'MyCima', baseUrl: 'https://mycima.tube', getMovieUrl: (id) => `https://mycima.tube/search/${id}`, getTvUrl: (id, s, e) => `https://mycima.tube/search/${id}` },
+    { name: 'Akwam', baseUrl: 'https://akwam.to', getMovieUrl: (id) => `https://akwam.to/search?q=${id}`, getTvUrl: (id, s, e) => `https://akwam.to/search?q=${id}` },
+    { name: 'Cima4U', baseUrl: 'https://cima4u.io', getMovieUrl: (id) => `https://cima4u.io/search/${id}`, getTvUrl: (id, s, e) => `https://cima4u.io/search/${id}` },
+    { name: 'Shahid4U', baseUrl: 'https://shahid4u.com', getMovieUrl: (id) => `https://shahid4u.com/?s=${id}`, getTvUrl: (id, s, e) => `https://shahid4u.com/?s=${id}` },
+    { name: 'FaselAd', baseUrl: 'https://faselhd.co', getMovieUrl: (id) => `https://faselhd.co/?s=${id}`, getTvUrl: (id, s, e) => `https://faselhd.co/?s=${id}` },
+    { name: 'ArabSeed', baseUrl: 'https://arabseed.show', getMovieUrl: (id) => `https://arabseed.show/?s=${id}`, getTvUrl: (id, s, e) => `https://arabseed.show/?s=${id}` },
+    { name: 'Movs4u', baseUrl: 'https://movs4u.ws', getMovieUrl: (id) => `https://movs4u.ws/?s=${id}`, getTvUrl: (id, s, e) => `https://movs4u.ws/?s=${id}` },
+    { name: 'CimaClub', baseUrl: 'https://cimaclub.com', getMovieUrl: (id) => `https://cimaclub.com/?s=${id}`, getTvUrl: (id, s, e) => `https://cimaclub.com/?s=${id}` },
+
+    // --- 🎬 Global Providers ---
+    { name: 'VidSrc', baseUrl: 'https://vidsrc.me', getMovieUrl: (id) => `https://vidsrc.me/embed/movie?tmdb=${id}`, getTvUrl: (id, s, e) => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}` },
+    { name: 'Fmovies', baseUrl: 'https://fmovies.to', getMovieUrl: (id) => `https://fmovies.to/search?keyword=${id}`, getTvUrl: (id, s, e) => `https://fmovies.to/search?keyword=${id}` },
+    { name: '123Movies', baseUrl: 'https://123movies.com', getMovieUrl: (id) => `https://123movies.com/search/${id}`, getTvUrl: (id, s, e) => `https://123movies.com/search/${id}` },
+    { name: 'Soap2Day', baseUrl: 'https://soap2day.to', getMovieUrl: (id) => `https://soap2day.to/search/keyword/${id}`, getTvUrl: (id, s, e) => `https://soap2day.to/search/keyword/${id}` },
+    { name: 'SolarMovies', baseUrl: 'https://solarmovie.pe', getMovieUrl: (id) => `https://solarmovie.pe/search/${id}`, getTvUrl: (id, s, e) => `https://solarmovie.pe/search/${id}` },
+    { name: 'Putlocker', baseUrl: 'https://putlocker.vc', getMovieUrl: (id) => `https://putlocker.vc/search?keyword=${id}`, getTvUrl: (id, s, e) => `https://putlocker.vc/search?keyword=${id}` },
+
+    // --- 🎌 Anime Providers ---
+    { name: 'AnimeSlayer', baseUrl: 'https://anslayer.com', getMovieUrl: (id) => `https://anslayer.com/?s=${id}`, getTvUrl: (id, s, e) => `https://anslayer.com/?s=${id}` },
+    { name: 'WitAnime', baseUrl: 'https://witanime.com', getMovieUrl: (id) => `https://witanime.com/?s=${id}`, getTvUrl: (id, s, e) => `https://witanime.com/?s=${id}` },
+    { name: 'GogoAnime', baseUrl: 'https://gogoanime.tel', getMovieUrl: (id) => `https://gogoanime.tel/search.html?keyword=${id}`, getTvUrl: (id, s, e) => `https://gogoanime.tel/search.html?keyword=${id}` },
+    { name: '9Anime', baseUrl: 'https://9anime.to', getMovieUrl: (id) => `https://9anime.to/search?keyword=${id}`, getTvUrl: (id, s, e) => `https://9anime.to/search?keyword=${id}` },
+    { name: 'KissAnime', baseUrl: 'https://kissanime.com.ru', getMovieUrl: (id) => `https://kissanime.com.ru/Search/?s=${id}`, getTvUrl: (id, s, e) => `https://kissanime.com.ru/Search/?s=${id}` }
   ];
 
   static async resolveFromTmdb(type: 'movie' | 'tv', id: string, season?: number, episode?: number): Promise<any[]> {
