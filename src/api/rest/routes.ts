@@ -6,6 +6,8 @@ import { IptvManager } from '../../core/iptv/iptv.manager.js';
 import { TmdbService } from '../../services/tmdb/tmdb.service.js';
 import { SmartResolver } from '../../core/resolver/smart-resolver.js';
 import { ValidationEngine } from '../../core/validation-engine/validation.engine.js';
+import { SubtitleService } from '../../services/subtitles/subtitle.service.js';
+import { QualityOrchestrator } from '../../core/orchestrator/quality.orchestrator.js';
 
 const router: Router = Router();
 const tmdb = new TmdbService(process.env.TMDB_API_KEY || '');
@@ -26,13 +28,25 @@ router.get('/resolve', async (req, res) => {
     if (!url) return res.status(400).json({ error: 'URL is required' });
     
     const cached = cacheService.get(`resolve:${url}`);
-    if (cached) return res.json({ links: cached });
+    if (cached) return res.json(cached);
 
-    const links = await SmartResolver.resolve(url as string);
+    const [links, subtitles, qualities] = await Promise.all([
+      SmartResolver.resolve(url as string),
+      SubtitleService.getSubtitles(url as string),
+      QualityOrchestrator.getAvailableQualities(url as string)
+    ]);
+
     const validLinks = await ValidationEngine.validateBatch(links);
     
-    cacheService.set(`resolve:${url}`, validLinks);
-    res.json({ links: validLinks });
+    const result = {
+      links: validLinks,
+      subtitles,
+      qualities,
+      masterPlaylist: qualities.length > 0 ? QualityOrchestrator.generateMasterPlaylist(qualities) : null
+    };
+
+    cacheService.set(`resolve:${url}`, result);
+    res.json(result);
   } catch (error: any) {
     res.status(500).json({ error: 'Resolution failed', details: error.message });
   }
