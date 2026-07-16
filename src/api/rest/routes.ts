@@ -3,7 +3,7 @@ import { ProxyEngine } from '../../core/proxy-engine/proxy.engine.js';
 import { sourceAggregator } from '../../core/source-discovery/aggregator.js';
 import { cacheService } from '../../core/cache-layer/cache.service.js';
 
-const router = Router();
+const router: Router = Router();
 
 router.get('/proxy', async (req, res) => {
   const { url } = req.query;
@@ -24,7 +24,8 @@ router.get('/search', async (req, res) => {
 });
 
 router.get('/health', (req, res) => {
-  res.json({ status: 'ok', uptime: process.uptime() });
+  console.log('Health check requested');
+  res.status(200).json({ status: 'ok', uptime: process.uptime() });
 });
 
 router.get('/metrics', (req, res) => {

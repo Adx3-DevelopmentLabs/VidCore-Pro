@@ -1,4 +1,5 @@
-import { BaseAggregator, MediaSource } from '../../core/source-discovery/aggregator.js';
+import { BaseAggregator } from '../../core/source-discovery/aggregator.js';
+import type { MediaSource } from '../../core/source-discovery/aggregator.js';
 
 export class SampleMovieAggregator extends BaseAggregator {
   name = 'SampleMovie';

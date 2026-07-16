@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import logger from '../../utils/logger.js';
 
 export class ProxyEngine {
@@ -18,7 +18,7 @@ export class ProxyEngine {
       });
 
       // Forward headers
-      res.setHeader('Content-Type', response.headers['content-type'] || 'application/vnd.apple.mpegurl');
+      res.setHeader('Content-Type', (response.headers['content-type'] as string) || 'application/vnd.apple.mpegurl');
       res.setHeader('Access-Control-Allow-Origin', '*');
 
       response.data.pipe(res);

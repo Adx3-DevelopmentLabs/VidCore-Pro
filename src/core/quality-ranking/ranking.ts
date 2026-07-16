@@ -1,4 +1,4 @@
-import { MediaSource } from '../source-discovery/aggregator.js';
+import type { MediaSource } from '../source-discovery/aggregator.js';
 
 export class QualityRanking {
   private static qualityMap: Record<string, number> = {
