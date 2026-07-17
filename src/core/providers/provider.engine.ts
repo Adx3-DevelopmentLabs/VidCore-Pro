@@ -33,24 +33,40 @@ export class ProviderEngine {
     
     const mediaInfo = await SmartMappingEngine.getMediaInfo(id, type);
     
-    const results = await Promise.all(this.providers.map(async (provider) => {
-      const embedUrl = type === 'movie' 
-        ? provider.getMovieUrl(id, mediaInfo || undefined) 
-        : provider.getTvUrl(id, season || 1, episode || 1, mediaInfo || undefined);
+    const results: any[] = [];
+    const batchSize = 3; // Processing only 3 providers at a time to save RAM/CPU
+    
+    for (let i = 0; i < this.providers.length; i += batchSize) {
+      const batch = this.providers.slice(i, i + batchSize);
+      const batchResults = await Promise.all(batch.map(async (provider) => {
+        const embedUrl = type === 'movie' 
+          ? provider.getMovieUrl(id, mediaInfo || undefined) 
+          : provider.getTvUrl(id, season || 1, episode || 1, mediaInfo || undefined);
+        
+        try {
+          // Set a strict timeout for each provider to prevent 502/Gateway Timeout
+          const links = await Promise.race([
+            SmartResolver.resolve(embedUrl),
+            new Promise<string[]>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000))
+          ]);
+          
+          return {
+            provider: provider.name,
+            embedUrl,
+            links
+          };
+        } catch (error: any) {
+          logger.warn(`Provider ${provider.name} skipped: ${error.message}`);
+          return null;
+        }
+      }));
       
-      try {
-        const links = await SmartResolver.resolve(embedUrl);
-        return {
-          provider: provider.name,
-          embedUrl,
-          links
-        };
-      } catch (error: any) {
-        logger.error(`Provider ${provider.name} failed: ${error.message}`);
-        return null;
-      }
-    }));
+      results.push(...batchResults.filter(r => r !== null && r.links.length > 0));
+      
+      // If we already found good links, we can stop early to be faster (Optional)
+      if (results.length >= 5) break; 
+    }
 
-    return results.filter(r => r !== null && r.links.length > 0);
+    return results;
   }
 }

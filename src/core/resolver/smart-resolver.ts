@@ -26,7 +26,7 @@ export class SmartResolver {
           'Accept-Language': 'en-US,en;q=0.9',
           'Referer': new URL(url).origin,
         },
-        timeout: 10000
+        timeout: 6000
       });
 
       const $ = cheerio.load(response.data);
